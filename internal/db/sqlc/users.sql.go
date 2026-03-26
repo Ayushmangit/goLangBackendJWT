@@ -12,31 +12,39 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (id,email,password)
-VALUES ($1,$2,$3)
-returning id, email, password, created_at
+INSERT INTO users (id, email, password, role)
+VALUES ($1, $2, $3, $4)
+ON CONFLICT (email) DO NOTHING
+RETURNING id, email, password, created_at, role
 `
 
 type CreateUserParams struct {
 	ID       pgtype.UUID
 	Email    string
 	Password string
+	Role     string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.ID, arg.Email, arg.Password)
+	row := q.db.QueryRow(ctx, createUser,
+		arg.ID,
+		arg.Email,
+		arg.Password,
+		arg.Role,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Email,
 		&i.Password,
 		&i.CreatedAt,
+		&i.Role,
 	)
 	return i, err
 }
 
 const findByID = `-- name: FindByID :one
-SELECT id, email, password, created_at FROM users where id = $1
+SELECT id, email, password, created_at, role FROM users where id = $1
 `
 
 func (q *Queries) FindByID(ctx context.Context, id pgtype.UUID) (User, error) {
@@ -47,12 +55,13 @@ func (q *Queries) FindByID(ctx context.Context, id pgtype.UUID) (User, error) {
 		&i.Email,
 		&i.Password,
 		&i.CreatedAt,
+		&i.Role,
 	)
 	return i, err
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password, created_at FROM users where email = $1
+SELECT id, email, password, created_at, role FROM users WHERE email = $1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -63,6 +72,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Email,
 		&i.Password,
 		&i.CreatedAt,
+		&i.Role,
 	)
 	return i, err
 }

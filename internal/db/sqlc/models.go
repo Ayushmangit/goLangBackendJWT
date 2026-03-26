@@ -8,9 +8,57 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Class struct {
+	ID        pgtype.UUID
+	Name      string
+	Section   pgtype.Text
+	CreatedAt pgtype.Timestamp
+}
+
+type Enrollment struct {
+	ID         pgtype.UUID
+	StudentID  pgtype.UUID
+	ClassID    pgtype.UUID
+	EnrolledAt pgtype.Timestamp
+}
+
+type Faculty struct {
+	ID          pgtype.UUID
+	UserID      pgtype.UUID
+	FullName    string
+	Department  pgtype.Text
+	Designation pgtype.Text
+	CreatedAt   pgtype.Timestamp
+}
+
+type Student struct {
+	ID          pgtype.UUID
+	UserID      pgtype.UUID
+	FullName    string
+	RollNumber  string
+	ClassID     pgtype.UUID
+	DateOfBirth pgtype.Date
+	CreatedAt   pgtype.Timestamp
+}
+
+type Subject struct {
+	ID        pgtype.UUID
+	Name      string
+	CreatedAt pgtype.Timestamp
+}
+
+type TeachingAssignment struct {
+	ID         pgtype.UUID
+	FacultyID  pgtype.UUID
+	SubjectID  pgtype.UUID
+	ClassID    pgtype.UUID
+	AssignedAt pgtype.Timestamp
+}
+
 type User struct {
 	ID        pgtype.UUID
 	Email     string
 	Password  string
 	CreatedAt pgtype.Timestamp
+	Role      string
 }
