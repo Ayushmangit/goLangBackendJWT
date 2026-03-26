@@ -18,7 +18,8 @@ type RegisterRequest struct {
 type AuthResponse struct {
 	ID    string `json:"id"`
 	Email string `json:"email"`
-	Token string `json:"token"`
+	Role  string `json:"role"`
+	Token string `json:"token,omitempty"`
 }
 
 type AuthHandler struct {
@@ -51,6 +52,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, http.StatusCreated, AuthResponse{
 		ID:    user.ID.String(),
 		Email: user.Email,
+		Role:  user.Role,
 	})
 }
 
@@ -67,13 +69,14 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := jwt.GenerateToken(user.ID.String(), user.Email)
+	token, err := jwt.GenerateToken(user.ID.String(), user.Email, user.Role)
 	if err != nil {
 		response.Error(w, http.StatusInternalServerError, "Failed to generate Token")
 	}
 	res := AuthResponse{
 		ID:    user.ID.String(),
 		Email: user.Email,
+		Role:  user.Role,
 		Token: token,
 	}
 	response.JSON(w, http.StatusOK, res)
@@ -94,5 +97,6 @@ func (h *AuthHandler) Me(w http.ResponseWriter, r *http.Request) {
 	response.JSON(w, http.StatusOK, AuthResponse{
 		ID:    user.ID.String(),
 		Email: user.Email,
+		Role:  user.Role,
 	})
 }
