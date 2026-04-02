@@ -8,7 +8,7 @@ package sqlc
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -19,7 +19,7 @@ RETURNING id, email, password, created_at, role
 `
 
 type CreateUserParams struct {
-	ID       pgtype.UUID
+	ID       uuid.UUID
 	Email    string
 	Password string
 	Role     string
@@ -47,7 +47,7 @@ const findByID = `-- name: FindByID :one
 SELECT id, email, password, created_at, role FROM users where id = $1
 `
 
-func (q *Queries) FindByID(ctx context.Context, id pgtype.UUID) (User, error) {
+func (q *Queries) FindByID(ctx context.Context, id uuid.UUID) (User, error) {
 	row := q.db.QueryRow(ctx, findByID, id)
 	var i User
 	err := row.Scan(

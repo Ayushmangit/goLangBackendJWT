@@ -69,7 +69,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := jwt.GenerateToken(user.ID.String(), user.Email, user.Role)
+	token, err := jwt.GenerateToken(user.ID, user.Email, user.Role)
 	if err != nil {
 		response.Error(w, http.StatusInternalServerError, "Failed to generate Token")
 	}

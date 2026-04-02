@@ -8,7 +8,7 @@ package sqlc
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const createSubject = `-- name: CreateSubject :one
@@ -19,7 +19,7 @@ RETURNING id, name, created_at
 `
 
 type CreateSubjectParams struct {
-	ID   pgtype.UUID
+	ID   uuid.UUID
 	Name string
 }
 

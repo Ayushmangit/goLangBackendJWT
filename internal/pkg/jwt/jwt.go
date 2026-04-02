@@ -1,25 +1,25 @@
 package jwt
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Ayushmangit/goLangBackendJWT/internal/env"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 var secretKey = []byte(env.GetString("SECRET", "asdagadhgfsadhfadf312"))
 
 type Claims struct {
-	UserID string `json:"user_id"`
-	Email  string `json:"email"`
-	Role   string `json:"role"`
+	UserID uuid.UUID `json:"user_id"`
+	Email  string    `json:"email"`
+	Role   string    `json:"role"`
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(userId, email, role string) (string, error) {
+func GenerateToken(userID uuid.UUID, email, role string) (string, error) {
 	claims := Claims{
-		UserID: userId,
+		UserID: userID,
 		Email:  email,
 		Role:   role,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -27,7 +27,7 @@ func GenerateToken(userId, email, role string) (string, error) {
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
-	fmt.Println("GENERATING TOKEN USER ID:", claims.UserID)
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(secretKey)
 }

@@ -5,26 +5,27 @@
 package sqlc
 
 import (
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Class struct {
-	ID        pgtype.UUID
+	ID        uuid.UUID
 	Name      string
-	Section   pgtype.Text
+	Section   string
 	CreatedAt pgtype.Timestamp
 }
 
 type Enrollment struct {
-	ID         pgtype.UUID
-	StudentID  pgtype.UUID
-	ClassID    pgtype.UUID
+	ID         uuid.UUID
+	StudentID  uuid.UUID
+	ClassID    uuid.UUID
 	EnrolledAt pgtype.Timestamp
 }
 
 type Faculty struct {
-	ID          pgtype.UUID
-	UserID      pgtype.UUID
+	ID          uuid.UUID
+	UserID      uuid.UUID
 	FullName    string
 	Department  pgtype.Text
 	Designation pgtype.Text
@@ -32,31 +33,31 @@ type Faculty struct {
 }
 
 type Student struct {
-	ID          pgtype.UUID
-	UserID      pgtype.UUID
+	ID          uuid.UUID
+	UserID      uuid.UUID
 	FullName    string
 	RollNumber  string
-	ClassID     pgtype.UUID
+	ClassID     uuid.UUID
 	DateOfBirth pgtype.Date
 	CreatedAt   pgtype.Timestamp
 }
 
 type Subject struct {
-	ID        pgtype.UUID
+	ID        uuid.UUID
 	Name      string
 	CreatedAt pgtype.Timestamp
 }
 
 type TeachingAssignment struct {
-	ID         pgtype.UUID
-	FacultyID  pgtype.UUID
-	SubjectID  pgtype.UUID
-	ClassID    pgtype.UUID
+	ID         uuid.UUID
+	FacultyID  uuid.UUID
+	SubjectID  uuid.UUID
+	ClassID    uuid.UUID
 	AssignedAt pgtype.Timestamp
 }
 
 type User struct {
-	ID        pgtype.UUID
+	ID        uuid.UUID
 	Email     string
 	Password  string
 	CreatedAt pgtype.Timestamp

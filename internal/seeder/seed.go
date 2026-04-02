@@ -7,8 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/Ayushmangit/goLangBackendJWT/internal/db/sqlc"
-	"github.com/Ayushmangit/goLangBackendJWT/internal/pkg/utils"
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 func Seed(ctx context.Context, queries *sqlc.Queries) error {
@@ -40,7 +39,7 @@ func seedSubjects(ctx context.Context, q *sqlc.Queries) error {
 
 	for _, name := range subjects {
 		_, err := q.CreateSubject(ctx, sqlc.CreateSubjectParams{
-			ID:   utils.NewPGUUID(),
+			ID:   uuid.New(), // ✅ clean UUID
 			Name: name,
 		})
 
@@ -49,7 +48,7 @@ func seedSubjects(ctx context.Context, q *sqlc.Queries) error {
 		}
 	}
 
-	log.Println(" Subjects seeded")
+	log.Println("📚 Subjects seeded")
 	return nil
 }
 
@@ -65,9 +64,9 @@ func seedClasses(ctx context.Context, q *sqlc.Queries) error {
 
 	for _, c := range classes {
 		_, err := q.CreateClass(ctx, sqlc.CreateClassParams{
-			ID:      utils.NewPGUUID(),
+			ID:      uuid.New(), // ✅ UUID
 			Name:    c.name,
-			Section: pgtype.Text{String: c.section, Valid: true},
+			Section: c.section, // ✅ assuming sqlc now uses string
 		})
 
 		if err != nil {
@@ -104,12 +103,11 @@ func seedStudents(ctx context.Context, q *sqlc.Queries) error {
 		}
 
 		_, err = q.CreateUser(ctx, sqlc.CreateUserParams{
-			ID:       utils.NewPGUUID(),
+			ID:       uuid.New(), // ✅ UUID
 			Email:    s.email,
 			Password: string(hashedPassword),
 			Role:     "student",
 		})
-
 		if err != nil {
 			log.Println("user insert skipped:", err)
 		}
@@ -120,13 +118,12 @@ func seedStudents(ctx context.Context, q *sqlc.Queries) error {
 		}
 
 		_, err = q.CreateStudent(ctx, sqlc.CreateStudentParams{
-			ID:         utils.NewPGUUID(),
-			UserID:     user.ID,
+			ID:         uuid.New(), // ✅ UUID
+			UserID:     user.ID,    // already uuid.UUID
 			FullName:   s.fullName,
 			RollNumber: s.rollNumber,
-			ClassID:    class.ID,
+			ClassID:    class.ID, // must also be uuid.UUID
 		})
-
 		if err != nil {
 			log.Println("student insert skipped:", err)
 		}

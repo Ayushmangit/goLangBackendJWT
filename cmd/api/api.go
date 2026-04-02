@@ -30,54 +30,57 @@ func (app *application) run(mux http.Handler) error {
 		Addr:         app.config.addr,
 		Handler:      mux,
 		IdleTimeout:  time.Minute,
-		ReadTimeout:  time.Second * 30,
-		WriteTimeout: time.Second * 30,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
 	}
-	log.Printf("The Server is Listening on port : %s\n", srv.Addr)
+
+	log.Printf("Server running on %s\n", srv.Addr)
 	return srv.ListenAndServe()
 }
 
 func (app *application) mount() *chi.Mux {
-
 	ctx := context.Background()
-	r := chi.NewRouter()
 
 	conn, err := pgxpool.New(ctx, env.GetString("DSN", "postgres://root:71883@localhost:5433/app?sslmode=disable"))
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	queries := sqlc.New(conn)
 
 	userRepo := repository.NewUserRepository(queries)
 	userService := service.NewUserService(userRepo)
 	authHandler := handler.NewAuthHandler(userService)
 
+	studentRepo := repository.NewStudentRepository(queries)
+	studentService := service.NewStudentService(studentRepo)
+	studentHandler := handler.NewStudentHandler(studentService)
+
+	r := chi.NewRouter()
+
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hi"))
-	})
-
-	r.Get("/test", func(w http.ResponseWriter, r *http.Request) {
-		_, err := userService.Register(ctx, "test@example.com", "password123")
-		if err != nil {
-			w.Write([]byte(err.Error()))
-			return
-		}
-		w.Write([]byte("user Created"))
+		w.Write([]byte("OK"))
 	})
 
 	r.Route("/api/v1", func(r chi.Router) {
+
 		r.Route("/auth", func(r chi.Router) {
 			r.Post("/register", authHandler.Register)
 			r.Post("/login", authHandler.Login)
 			r.With(myMiddleware.AuthMiddleware).Get("/me", authHandler.Me)
 		})
+
+		r.Route("/students", func(r chi.Router) {
+			r.Use(myMiddleware.AuthMiddleware)
+			r.Post("/", studentHandler.CreateStudent)
+		})
 	})
+
 	return r
 }

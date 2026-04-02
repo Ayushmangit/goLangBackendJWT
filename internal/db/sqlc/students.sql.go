@@ -8,7 +8,7 @@ package sqlc
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const createStudent = `-- name: CreateStudent :one
@@ -19,11 +19,11 @@ RETURNING id, user_id, full_name, roll_number, class_id, date_of_birth, created_
 `
 
 type CreateStudentParams struct {
-	ID         pgtype.UUID
-	UserID     pgtype.UUID
+	ID         uuid.UUID
+	UserID     uuid.UUID
 	FullName   string
 	RollNumber string
-	ClassID    pgtype.UUID
+	ClassID    uuid.UUID
 }
 
 func (q *Queries) CreateStudent(ctx context.Context, arg CreateStudentParams) (Student, error) {
