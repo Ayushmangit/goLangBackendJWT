@@ -17,7 +17,6 @@ type userRepo struct {
 	queries *sqlc.Queries
 }
 
-// dependency injection
 func NewUserRepository(q *sqlc.Queries) UserRepository {
 	return &userRepo{
 		queries: q,
